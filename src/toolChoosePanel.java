@@ -3,6 +3,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.*;
+import javax.swing.border.*;
 
 @SuppressWarnings("serial")
 public class toolChoosePanel extends JPanel implements ActionListener{
@@ -12,7 +13,7 @@ public class toolChoosePanel extends JPanel implements ActionListener{
 	public toolChoosePanel(mainPanel mp)
 	{   
 		this.mp = mp;
-		JLabel info = new JLabel("    工具箱    ");
+		setBorder(new TitledBorder("工具箱"));
 		pencil = new JButton(new ImageIcon("src/icon/pencil.png"));
 		eraser = new JButton(new ImageIcon("src/icon/eraser.png"));
 		pline = new JButton(new ImageIcon("src/icon/line.png"));
@@ -32,15 +33,25 @@ public class toolChoosePanel extends JPanel implements ActionListener{
 		filler.setBorder(BorderFactory.createRaisedBevelBorder());
 		clear.setBorder(BorderFactory.createRaisedBevelBorder());
 		
+		pencil.setToolTipText("铅笔工具");
+		eraser.setToolTipText("橡皮工具");
+		pline.setToolTipText("直线");
+		pcircle.setToolTipText("圆形");
+		prectangle.setToolTipText("矩形");
+		filler.setToolTipText("套索填充工具");
+		clear.setToolTipText("清空画板");
+		undo.setToolTipText("撤销");
+		redo.setToolTipText("重做");
+		
 		pencil.setPreferredSize(new Dimension(40,30));
-		eraser.setPreferredSize(new Dimension(45,30));
-		pline.setPreferredSize(new Dimension(45,30));
-		pcircle.setPreferredSize(new Dimension(45,30));
-		prectangle.setPreferredSize(new Dimension(45,30));
-		undo.setPreferredSize(new Dimension(45,30));
-		redo.setPreferredSize(new Dimension(45,30));
-		filler.setPreferredSize(new Dimension(45,30));
-		clear.setPreferredSize(new Dimension(90,30));
+		eraser.setPreferredSize(new Dimension(40,30));
+		pline.setPreferredSize(new Dimension(40,30));
+		pcircle.setPreferredSize(new Dimension(40,30));
+		prectangle.setPreferredSize(new Dimension(40,30));
+		undo.setPreferredSize(new Dimension(40,30));
+		redo.setPreferredSize(new Dimension(40,30));
+		filler.setPreferredSize(new Dimension(40,30));
+		clear.setPreferredSize(new Dimension(85,30));
 		
 		pencil.addActionListener(this);
 		eraser.addActionListener(this);
@@ -53,7 +64,6 @@ public class toolChoosePanel extends JPanel implements ActionListener{
 		clear.addActionListener(this);
 		
 		this.setPreferredSize(new Dimension(100,200));
-		this.add(info);
 		this.add(pencil);
 		this.add(eraser);
 		this.add(pline);
@@ -78,6 +88,7 @@ public class toolChoosePanel extends JPanel implements ActionListener{
 			filler.setBorder(BorderFactory.createRaisedBevelBorder());
 			clear.setBorder(BorderFactory.createRaisedBevelBorder());
 			mp.paintpanel.imgcursor = mp.paintpanel.kit.getImage("src/icon/pencil.png");
+			mp.paintpanel.cursorfocus = new Point(6, 24);
 			mp.paintpanel.repaint();
 			
 		}
@@ -93,6 +104,7 @@ public class toolChoosePanel extends JPanel implements ActionListener{
 			filler.setBorder(BorderFactory.createRaisedBevelBorder());
 			clear.setBorder(BorderFactory.createRaisedBevelBorder());
 			mp.paintpanel.imgcursor = mp.paintpanel.kit.getImage("src/icon/eraser.png");
+			mp.paintpanel.cursorfocus = new Point(10, 23);
 			mp.paintpanel.repaint();
 		}
 		else if(e.getSource() == pline){
@@ -106,6 +118,7 @@ public class toolChoosePanel extends JPanel implements ActionListener{
 			filler.setBorder(BorderFactory.createRaisedBevelBorder());
 			clear.setBorder(BorderFactory.createRaisedBevelBorder());
 			mp.paintpanel.imgcursor = mp.paintpanel.kit.getImage("src/icon/pencil.png");
+			mp.paintpanel.cursorfocus = new Point(6, 24);
 			mp.paintpanel.repaint();
 		}
 		else if(e.getSource() == pcircle) {
@@ -119,6 +132,7 @@ public class toolChoosePanel extends JPanel implements ActionListener{
 			filler.setBorder(BorderFactory.createRaisedBevelBorder());
 			clear.setBorder(BorderFactory.createRaisedBevelBorder());
 			mp.paintpanel.imgcursor = mp.paintpanel.kit.getImage("src/icon/pencil.png");
+			mp.paintpanel.cursorfocus = new Point(6, 24);
 			mp.paintpanel.repaint();
 		}
 		else if(e.getSource() == prectangle) {
@@ -132,6 +146,7 @@ public class toolChoosePanel extends JPanel implements ActionListener{
 			filler.setBorder(BorderFactory.createRaisedBevelBorder());
 			clear.setBorder(BorderFactory.createRaisedBevelBorder());
 			mp.paintpanel.imgcursor = mp.paintpanel.kit.getImage("src/icon/pencil.png");
+			mp.paintpanel.cursorfocus = new Point(6, 24);
 			mp.paintpanel.repaint();
 		}
 		else if(e.getSource() == filler) {
@@ -144,7 +159,8 @@ public class toolChoosePanel extends JPanel implements ActionListener{
 			prectangle.setBorder(BorderFactory.createRaisedBevelBorder());
 			filler.setBorder(BorderFactory.createLoweredBevelBorder());
 			clear.setBorder(BorderFactory.createRaisedBevelBorder());
-			mp.paintpanel.imgcursor = mp.paintpanel.kit.getImage("src/icon/pencil.png");
+			mp.paintpanel.imgcursor = mp.paintpanel.kit.getImage("src/icon/lasso.png");
+			mp.paintpanel.cursorfocus = new Point(8, 31);
 			mp.paintpanel.repaint();
 		}
 		else if(e.getSource() == undo){
@@ -157,6 +173,13 @@ public class toolChoosePanel extends JPanel implements ActionListener{
 		{	
 			mp.paintpanel.clear();
 		}
+		
+		if(e.getSource() == pcircle) {
+			mp.status.setText("以鼠标落点为圆心，释放点为圆上一点，画圆.");
+		} else if(e.getSource() == filler) {
+			mp.status.setText("拖动鼠标以圈出一个区域并涂色.");
+		} else 
+			mp.status.setText("Java画图板    作者：HIT-CS 1130310217 杨志飞");
 		
 	}
 

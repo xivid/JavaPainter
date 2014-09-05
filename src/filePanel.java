@@ -1,5 +1,6 @@
 import javax.swing.*;
 import javax.imageio.ImageIO;
+import javax.swing.border.TitledBorder;
 import javax.swing.filechooser.FileFilter;
 
 import java.awt.image.*;
@@ -12,17 +13,22 @@ public class filePanel extends JPanel implements ActionListener{
 	mainPanel mp;
 	JButton fileopen, filesave, filesaveas, filenew;
 	public filePanel(mainPanel mp){
-		JLabel title = new JLabel("     文件     ");
+		setBorder(new TitledBorder("文件"));
 		this.mp = mp;
 		filenew = new JButton(new ImageIcon("src/icon/new.png"));
 		fileopen = new JButton(new ImageIcon("src/icon/open.png"));
 		filesave = new JButton(new ImageIcon("src/icon/save.png"));
 		filesaveas = new JButton(new ImageIcon("src/icon/saveas.png"));
 		
-		fileopen.setPreferredSize(new Dimension(45,30));
-		filesave.setPreferredSize(new Dimension(45,30));
-		filesaveas.setPreferredSize(new Dimension(45,30));
-		filenew.setPreferredSize(new Dimension(45,30));
+		filenew.setToolTipText("新建图片");
+		fileopen.setToolTipText("打开图片...");
+		filesave.setToolTipText("保存图片");
+		filesaveas.setToolTipText("另存为...");
+		
+		fileopen.setPreferredSize(new Dimension(40,30));
+		filesave.setPreferredSize(new Dimension(40,30));
+		filesaveas.setPreferredSize(new Dimension(40,30));
+		filenew.setPreferredSize(new Dimension(40,30));
 		
 		fileopen.addActionListener(this);
 		filesave.addActionListener(this);
@@ -30,7 +36,6 @@ public class filePanel extends JPanel implements ActionListener{
 		filenew.addActionListener(this);
 		
 		this.setPreferredSize(new Dimension(100, 100));
-		this.add(title);
 		this.add(filenew);
 		this.add(fileopen);
 		this.add(filesave);
@@ -43,8 +48,10 @@ public class filePanel extends JPanel implements ActionListener{
 		if (e.getSource() == filenew){
 			mp.paintpanel.hasimage = false;
 			mp.paintpanel.img = null;
-			mp.paintpanel.undoStack.clear();
 			mp.paintpanel.clear();
+			mp.paintpanel.undoStack.clear();
+			mp.mainwindow.setTitle("无标题 - Java画图板");
+			mp.status.setText("Java画图板    作者：HIT-CS 1130310217 杨志飞");
 		}
 		else if(e.getSource() == fileopen){
 			JFileChooser jc = new JFileChooser();
@@ -55,7 +62,6 @@ public class filePanel extends JPanel implements ActionListener{
                     }
                     return false;
                 }
-
                 public String getDescription() {
                     return "图片(*.jpg,*.png,*.gif)";
                 }
@@ -69,8 +75,10 @@ public class filePanel extends JPanel implements ActionListener{
                         BufferedImage newImage = ImageIO.read(new File(fileString));
                         mp.paintpanel.hasimage = true;
                         mp.paintpanel.img = newImage;
+                        mp.paintpanel.imgsrc = fileString;
+                        mp.mainwindow.setTitle(selectedFile.getName() + " - Java画图板");
+                        mp.status.setText(fileString + " 已打开.");
                         mp.paintpanel.repaint();
-
                     } catch (IOException ex) {
                         System.out.println(ex);
                     }
@@ -78,7 +86,18 @@ public class filePanel extends JPanel implements ActionListener{
                 }
             }
 		}
-		else if(e.getSource() == filesaveas){
+		else if (mp.paintpanel.hasimage && e.getSource() == filesave) {
+			BufferedImage image = new BufferedImage(mp.paintpanel.getWidth(),mp.paintpanel.getHeight(), BufferedImage.TYPE_INT_RGB);   
+			Graphics2D g2 = image.createGraphics();   
+			mp.paintpanel.paint(g2);
+			try {
+				ImageIO.write(image, mp.paintpanel.imgsrc.substring(mp.paintpanel.imgsrc.length()-3), new java.io.File(mp.paintpanel.imgsrc));
+				mp.status.setText(mp.paintpanel.imgsrc + " 保存成功.");
+			} catch (IOException e1) {
+				
+			}
+		}
+		else if(e.getSource() == filesaveas || e.getSource() == filesave){
 			BufferedImage image = new BufferedImage(mp.paintpanel.getWidth(),mp.paintpanel.getHeight(), BufferedImage.TYPE_INT_RGB);   
 			Graphics2D g2 = image.createGraphics();   
 			mp.paintpanel.paint(g2);
@@ -94,10 +113,6 @@ public class filePanel extends JPanel implements ActionListener{
                 public String getDescription() {
                     return "PNG图片(*.png)";
                 }
-                
-                public String getSuffix() {
-                	return ".png";
-                }
             });
 			
 			FileCh.setFileFilter(new FileFilter() {
@@ -109,10 +124,6 @@ public class filePanel extends JPanel implements ActionListener{
 
                 public String getDescription() {
                     return "GIF图片(*.gif)";
-                }
-                
-                public String getSuffix() {
-                	return ".gif";
                 }
             });
 			
@@ -126,10 +137,6 @@ public class filePanel extends JPanel implements ActionListener{
                 public String getDescription() {
                     return "JPEG图片（*.jpg）";
                 }
-                
-                public String getSuffix() {
-                	return ".jpg";
-                }
             });
 			int returnValue = FileCh.showSaveDialog(null);
             if (returnValue == JFileChooser.APPROVE_OPTION) {
@@ -142,15 +149,19 @@ public class filePanel extends JPanel implements ActionListener{
 					else if(FileCh.getFileFilter() == FileCh.getChoosableFileFilters()[2])
 						fileType = "gif";
 					
-					System.out.println(fileString);
-					System.out.println(fileType);
 					try {
 						ImageIO.write(image, fileType, new java.io.File(fileString+"."+fileType));
+		            	mp.paintpanel.hasimage = true;
+		            	mp.paintpanel.imgsrc = fileString + "." + fileType;
+		            	mp.paintpanel.img = image;
+						mp.mainwindow.setTitle(selectedFile.getName()+"."+fileType + " - Java画图板");
+						mp.status.setText("已保存为 " + fileString + "." + fileType + ".");
 					} catch (IOException e1) {
 						
 					}
 				}
             }
+            
 		}
 	}
 }

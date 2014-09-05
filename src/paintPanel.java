@@ -16,14 +16,16 @@ public class paintPanel extends JPanel {
 	public ArrayList<Color> colorList;
 	public ArrayList<Float> thickList;
 	public Color paintColor = Color.black;
+	public Color paintColor2 = Color.white;
 	public myPolygon poly, x;
 	public int beginX, beginY;
 	public float thick = 1f;
 	public Toolkit kit;
 	public Image imgcursor;
 	public BufferedImage img;
+	public String imgsrc;
 	public mainPanel mp;
-	public Point p;
+	public Point p, cursorfocus;
 	public boolean hasimage;
 	public class myPolygon extends Polygon {
 		public boolean isfill;
@@ -46,12 +48,13 @@ public class paintPanel extends JPanel {
 		List = new ArrayList<myPolygon>();
 		colorList = new ArrayList<Color>();
 		thickList = new ArrayList<Float>();
-		this.setBackground(Color.white);
-		this.setPreferredSize(new Dimension(600, 410));
-		this.addMouseListener(new paintListener());
-		this.addMouseMotionListener(new paintListener());
+		setBackground(Color.white);
+		setPreferredSize(new Dimension(600, 410));
+		addMouseListener(new paintListener());
+		addMouseMotionListener(new paintListener());
 		kit = Toolkit.getDefaultToolkit();
 		imgcursor = kit.getImage("src/icon/pencil.png");
+		cursorfocus = new Point(6, 24);
 	}
 
 	boolean justcleared;
@@ -73,7 +76,7 @@ public class paintPanel extends JPanel {
 		if(hasimage) g2d.drawImage(img, 0, 0, null);
 		for (int i = 0; i < List.size(); i++) {
 			g.setColor(colorList.get(i));
-			g2d.setStroke(new BasicStroke(thickList.get(i), BasicStroke.CAP_SQUARE, BasicStroke.JOIN_ROUND));
+			g2d.setStroke(new BasicStroke(thickList.get(i), BasicStroke.CAP_SQUARE, BasicStroke.JOIN_MITER));
 			x = List.get(i);
 			if(x.isfill)
 				g2d.fillPolygon(x);
@@ -81,8 +84,7 @@ public class paintPanel extends JPanel {
 				g2d.drawPolyline(x.xpoints, x.ypoints, x.npoints);
 		}
 		
-		Cursor cursor = kit.createCustomCursor(imgcursor, new Point(8, 23),
-				"custom cursor"); //TODO: 根据tool调整热点
+		Cursor cursor = kit.createCustomCursor(imgcursor, cursorfocus, "custom cursor");
 		setCursor(cursor);
 	}
 
@@ -168,8 +170,10 @@ public class paintPanel extends JPanel {
 				poly.isfill = true;
 			if (mp.toolchoosepanel.chosentool.equals("eraser"))
 				colorList.add(Color.white);
-			else
-				colorList.add(paintColor);
+			else {
+				if(e.getButton() == MouseEvent.BUTTON1) colorList.add(paintColor);
+				else colorList.add(paintColor2);
+			}
 			thickList.add(thick);
 		}
 
@@ -181,6 +185,8 @@ public class paintPanel extends JPanel {
 				poly.addPoint(currentX, currentY);
 				repaint();
 			}
+			else if (mp.toolchoosepanel.chosentool.equals("pcircle") || mp.toolchoosepanel.chosentool.equals("pline"))
+				List.remove(List.size() - 1);
 		}
 //未经测试的填充算法，基于深度优先搜索和屏幕像素捕捉
 //		public Color getColor(int x, int y){

@@ -5,9 +5,9 @@ import javax.swing.*;
 public class JavaPainter extends JFrame{
 
 	public JavaPainter() {
-		setTitle("ª≠Õº");
+		setTitle("Œﬁ±ÍÃ‚ - Javaª≠Õº∞Â");
 		setMinimumSize(new Dimension(1000, 650));
-		mainPanel mp = new mainPanel();
+		mainPanel mp = new mainPanel(this);
 		add(mp);
 		
 		setVisible(true);
